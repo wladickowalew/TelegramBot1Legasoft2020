@@ -3,11 +3,15 @@ public class User {
     private String secondName;
     private String command;
 
-    public User(String name) {
-        this.name = name;
+    {
         this.secondName = "";
         this.command = "";
     }
+
+    public User(){
+        this.command = "newUser";
+    }
+
 
     public String getSecondName() {
         return secondName;
