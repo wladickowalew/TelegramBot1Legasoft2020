@@ -5,10 +5,15 @@ import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class Main extends TelegramLongPollingBot {
 
@@ -30,13 +35,13 @@ public class Main extends TelegramLongPollingBot {
         String text = message.getText();
         long id = message.getChatId();
         System.out.println("" + id + ": " + text);
-        if (nonAutorizedUserHandler(message)) return;
+        if (nonAuthorizedUserHandler(message)) return;
         if (conditionHandler(message)) return;
         if (commandHandler(message)) return;
         sendMessage(message, users.get(id).getName() + " сказал: " + text);
     }
 
-    private boolean nonAutorizedUserHandler(Message message){
+    private boolean nonAuthorizedUserHandler(Message message){
         String text = message.getText();
         long id = message.getChatId();
         if (text.equals("/new_user")) {
@@ -108,7 +113,11 @@ public class Main extends TelegramLongPollingBot {
         String command = user.getCommand();
         if (command.equals(""))
             return false;
-
+        if (text.equals("/stop")){
+            sendMessage(message, "Команда успешно прервана");
+            user.setCommand("");
+            return true;
+        }
         if(command.equals("family")){
             user.setSecondName(text);
             sendMessage(message, "Ваша фамилия сохранена успешно!");
@@ -166,11 +175,32 @@ public class Main extends TelegramLongPollingBot {
         SendMessage message = new SendMessage();
         message.setChatId(m.getChatId());
         message.setText(text);
+        setButtons(message);
         try {
             execute(message);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
+    }
+
+    public void setButtons(SendMessage message){
+        ReplyKeyboardMarkup keyboard = new ReplyKeyboardMarkup();
+        message.setReplyMarkup(keyboard);
+        keyboard.setSelective(true);
+        keyboard.setResizeKeyboard(true);
+        keyboard.setOneTimeKeyboard(false);
+
+        List <KeyboardRow> rows = new ArrayList<>();
+        KeyboardRow row1 = new KeyboardRow();
+        row1.add(new KeyboardButton("/help"));
+        row1.add(new KeyboardButton("/new_user"));
+        rows.add(row1);
+
+        KeyboardRow row2 = new KeyboardRow();
+        row2.add(new KeyboardButton("/stop"));
+        rows.add(row2);
+
+        keyboard.setKeyboard(rows);
     }
 
     @Override
