@@ -2,10 +2,11 @@ public class User {
     private String name;
     private String secondName;
     private String command;
+    private int age;
 
     {
         this.secondName = "";
-        this.command = "";
+        this.age = -1;
     }
 
     public User(){
@@ -36,4 +37,14 @@ public class User {
     public void setCommand(String command) {
         this.command = command;
     }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+
 }

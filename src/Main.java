@@ -52,9 +52,20 @@ public class Main extends TelegramLongPollingBot {
         User user = users.get(id);
         if (text.equals("/my_family")) {
             if (user.getSecondName().equals(""))
-                sendMessage(message, "Я не знаю, вашей фамилии");
+                sendMessage(message, "Я не знаю вашей фамилии");
             else
                 sendMessage(message, "Ваша фамилия: " + user.getSecondName());
+            return true;
+        }
+        if (text.equals("/my_name")) {
+            sendMessage(message, "Ваше имя: " + user.getName());
+            return true;
+        }
+        if (text.equals("/my_age")) {
+            if (user.getAge() == -1)
+                sendMessage(message, "Я не знаю вашего возраста");
+            else
+                sendMessage(message, "Ваш возраст: " + user.getAge());
             return true;
         }
         if (text.equals("/change_family")) {
@@ -65,6 +76,11 @@ public class Main extends TelegramLongPollingBot {
         if (text.equals("/change_name")) {
             sendMessage(message, "Введите ваше новое имя");
             user.setCommand("name");
+            return true;
+        }
+        if (text.equals("/change_age")) {
+            sendMessage(message, "Введите ваш возраст");
+            user.setCommand("age");
             return true;
         }
         return false;
@@ -94,6 +110,21 @@ public class Main extends TelegramLongPollingBot {
             user.setName(text);
             sendMessage(message, "Приятно познакомится, " + text);
             user.setCommand("");
+            return true;
+        }
+        if(command.equals("age")) {
+            try {
+                int age = Integer.parseInt(text);
+                if( age < 0 || 150 < age){
+                    throw new IllegalArgumentException("no valid Age");
+                }
+                user.setAge(age);
+                sendMessage(message, "Ваш возраст успешно сохранён");
+                user.setCommand("");
+            }catch (Exception e){
+                e.printStackTrace();
+                sendMessage(message, "Вы ввели неверный возраст, попробуйтне ещё раз");
+            }
             return true;
         }
 
