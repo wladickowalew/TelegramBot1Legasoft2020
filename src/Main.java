@@ -30,20 +30,35 @@ public class Main extends TelegramLongPollingBot {
         String text = message.getText();
         long id = message.getChatId();
         System.out.println("" + id + ": " + text);
+        if (nonAutorizedUserHandler(message)) return;
+        if (conditionHandler(message)) return;
+        if (commandHandler(message)) return;
+        sendMessage(message, users.get(id).getName() + " сказал: " + text);
+    }
 
+    private boolean nonAutorizedUserHandler(Message message){
+        String text = message.getText();
+        long id = message.getChatId();
         if (text.equals("/new_user")) {
             sendMessage(message, "Привет, как тебя зовут?");
             User user = new User();
             users.put(id, user);
-            return;
+            return true;
+        }
+        if (text.equals("/help")) {
+            sendMessage(message, textHelp());
+            return true;
+        }
+        if (text.equals("/start")) {
+            sendMessage(message, "Привет, пользователь! Я буду следить за тобой) а ты сам мне всё расскажешь");
+            sendMessage(message, textHelp());
+            return true;
         }
         if (!users.containsKey(id)){
             sendMessage(message, "Мы незнакомы");
-            return;
+            return true;
         }
-        if (conditionHandler(message)) return;
-        if (commandHandler(message)) return;
-        sendMessage(message, users.get(id).getName() + " сказал: " + text);
+        return false;
     }
 
     private boolean commandHandler(Message message){
@@ -131,6 +146,19 @@ public class Main extends TelegramLongPollingBot {
         sendMessage(message, "Что-то пошло не так");
         user.setCommand("");
         return true;
+    }
+
+    private String textHelp(){
+        return "Привет, я бот из Легасофта и умею мого чего:\n"+
+                "/help - выведет это сообщение,\n"+
+                "/start - начать работу с ботом с этой кнопки,\n"+
+                "/new_user - создаст нового пользователя, перезаписав старого,\n"+
+                "/my_name - выведет имя пользователя,\n"+
+                "/change_name - изменит имя пользователя,\n"+
+                "/my_family - выведет фамилию пользователя,\n"+
+                "/change_family - изменит фамилию пользователя,\n"+
+                "/my_age - выведет возраст пользователя,\n"+
+                "/change_age - изменит возраст пользователя,\n";
     }
 
 
